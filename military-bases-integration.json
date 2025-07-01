@@ -1,0 +1,608 @@
+{
+  "name": "projects/445232805580/locations/us-central1/integrations/military-bases/versions/144c7057-89bc-4956-a658-1e5e76bf0493",
+  "description": "\n # Overview\nMilitary Base Information Retrieval\n\n## Orchestration\nThis integration retrieves information about military bases, including their addresses, based on either a list of states or the name of a specific base.  It\u0027s triggered by two separate API calls: \"Get List API\" and \"Get Detail API\".\n\n**Get List API Flow:**  When triggered by the \"Get List API\", the workflow sets a filter based on the provided state(s), queries a database, and extracts the relevant military bases. If only one base is found, the workflow retrieves a Geocode API key, prepares parameters for a geocoding request, retrieves the address of the base using a REST API call, and finally injects the retrieved address into the output.\n\n**Get Detail API Flow:** When triggered by the \"Get Detail API\", the workflow functions similarly, but sets the filter based on the provided base name instead of a state. It then follows the same steps of querying the database, extracting the base information, retrieving the geocoding API key (if only one base is found), preparing geocoding parameters, making the REST API call to get the address, and injecting the address into the output.",
+  "updateTime": "2025-07-01T14:37:37.225Z",
+  "createTime": "2025-06-27T18:44:39.045Z",
+  "lastModifierEmail": "admin@kdrowe.altostrat.com",
+  "triggerConfigs": [{
+    "label": "Get List API",
+    "startTasks": [{
+      "taskId": "3"
+    }],
+    "properties": {
+      "Trigger name": "military-bases_API_1"
+    },
+    "triggerType": "API",
+    "triggerNumber": "1",
+    "triggerId": "api_trigger/military-bases_API_1",
+    "position": {
+      "x": -347,
+      "y": -432
+    },
+    "inputVariables": {
+      "names": ["State"]
+    },
+    "outputVariables": {
+      "names": ["bases"]
+    }
+  }, {
+    "label": "Get Detail API",
+    "startTasks": [{
+      "taskId": "4"
+    }],
+    "properties": {
+      "Trigger name": "military-bases_API_2"
+    },
+    "triggerType": "API",
+    "triggerNumber": "2",
+    "triggerId": "api_trigger/military-bases_API_2",
+    "position": {
+      "x": -67,
+      "y": -428
+    },
+    "inputVariables": {
+      "names": ["Site"]
+    },
+    "outputVariables": {
+      "names": ["bases"]
+    }
+  }],
+  "taskConfigs": [{
+    "task": "GenericConnectorTask",
+    "taskId": "1",
+    "parameters": {
+      "listEntitiesSortByColumns": {
+        "key": "listEntitiesSortByColumns",
+        "value": {
+          "stringValue": "$`Task_1_listEntitiesSortByColumns`$"
+        }
+      },
+      "filterClause": {
+        "key": "filterClause",
+        "value": {
+          "stringValue": "$`Task_1_filterClause`$"
+        }
+      },
+      "listEntitiesPageToken": {
+        "key": "listEntitiesPageToken",
+        "value": {
+          "stringValue": "$`Task_1_listEntitiesPageToken`$"
+        }
+      },
+      "entityType": {
+        "key": "entityType",
+        "value": {
+          "stringValue": "military_bases"
+        }
+      },
+      "listEntitiesPageSize": {
+        "key": "listEntitiesPageSize",
+        "value": {
+          "stringValue": "$`Task_1_listEntitiesPageSize`$"
+        }
+      },
+      "authOverrideEnabled": {
+        "key": "authOverrideEnabled",
+        "value": {
+          "booleanValue": false
+        }
+      },
+      "listEntitiesNextPageToken": {
+        "key": "listEntitiesNextPageToken",
+        "value": {
+          "stringValue": "$`Task_1_listEntitiesNextPageToken`$"
+        }
+      },
+      "connectionName": {
+        "key": "connectionName",
+        "value": {
+          "stringValue": "projects/gps-ai-api/locations/us-central1/connections/military-bases"
+        }
+      },
+      "connectorOutputPayload": {
+        "key": "connectorOutputPayload",
+        "value": {
+          "stringValue": "$`Task_1_connectorOutputPayload`$"
+        }
+      },
+      "operation": {
+        "key": "operation",
+        "value": {
+          "stringValue": "LIST_ENTITIES"
+        }
+      },
+      "connectionVersion": {
+        "key": "connectionVersion",
+        "value": {
+          "stringValue": "projects/gps-ai-api/locations/global/providers/gcp/connectors/bigquery/versions/1"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "2"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Query the Database",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -264,
+      "y": -129
+    }
+  }, {
+    "task": "FieldMappingTask",
+    "taskId": "2",
+    "parameters": {
+      "FieldMappingConfigTaskParameterKey": {
+        "key": "FieldMappingConfigTaskParameterKey",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.FieldMappingConfig\",\n  \"mappedFields\": [{\n    \"inputField\": {\n      \"fieldType\": \"JSON_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$`Task_1_connectorOutputPayload`$\"\n        }\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$bases$\",\n      \"fieldType\": \"JSON_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"INT_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$bases$\"\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"jsonFunction\": {\n              \"functionName\": \"SIZE\"\n            }\n          }\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$baseCount$\",\n      \"fieldType\": \"INT_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"JSON_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$bases$\"\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"jsonFunction\": {\n              \"functionName\": \"GET_ELEMENT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"literalValue\": {\n                \"intValue\": \"0\"\n              }\n            }\n          }]\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$base$\",\n      \"fieldType\": \"JSON_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$base.Lat$\"\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"doubleFunction\": {\n              \"functionName\": \"TO_STRING\"\n            }\n          }\n        }, {\n          \"functionType\": {\n            \"stringFunction\": {\n              \"functionName\": \"CONCAT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"literalValue\": {\n                \"stringValue\": \",\"\n              }\n            }\n          }]\n        }, {\n          \"functionType\": {\n            \"stringFunction\": {\n              \"functionName\": \"CONCAT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"referenceValue\": \"$base.Long$\"\n            },\n            \"transformationFunctions\": [{\n              \"functionType\": {\n                \"doubleFunction\": {\n                  \"functionName\": \"TO_STRING\"\n                }\n              }\n            }]\n          }]\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$latlng$\",\n      \"fieldType\": \"STRING_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }]\n}"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "7",
+      "condition": "$baseCount$ \u003d 1"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Extract Military Bases",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -263,
+      "y": 23
+    }
+  }, {
+    "task": "FieldMappingTask",
+    "taskId": "3",
+    "parameters": {
+      "FieldMappingConfigTaskParameterKey": {
+        "key": "FieldMappingConfigTaskParameterKey",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.FieldMappingConfig\",\n  \"mappedFields\": [{\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"literalValue\": {\n            \"stringValue\": \"State_Terr \\u003d \\u0027\"\n          }\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"stringFunction\": {\n              \"functionName\": \"CONCAT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"referenceValue\": \"$State$\"\n            },\n            \"transformationFunctions\": [{\n              \"functionType\": {\n                \"stringFunction\": {\n                  \"functionName\": \"CONCAT\"\n                }\n              },\n              \"parameters\": [{\n                \"initialValue\": {\n                  \"literalValue\": {\n                    \"stringValue\": \"\\u0027\"\n                  }\n                }\n              }]\n            }]\n          }]\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$`Task_1_filterClause`$\",\n      \"fieldType\": \"STRING_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }]\n}"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "1"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Set Filter by State",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -427,
+      "y": -270
+    }
+  }, {
+    "task": "FieldMappingTask",
+    "taskId": "4",
+    "parameters": {
+      "FieldMappingConfigTaskParameterKey": {
+        "key": "FieldMappingConfigTaskParameterKey",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.FieldMappingConfig\",\n  \"mappedFields\": [{\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"literalValue\": {\n            \"stringValue\": \"Site_Name \\u003d \\u0027\"\n          }\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"stringFunction\": {\n              \"functionName\": \"CONCAT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"referenceValue\": \"$Site$\"\n            },\n            \"transformationFunctions\": [{\n              \"functionType\": {\n                \"stringFunction\": {\n                  \"functionName\": \"CONCAT\"\n                }\n              },\n              \"parameters\": [{\n                \"initialValue\": {\n                  \"literalValue\": {\n                    \"stringValue\": \"\\u0027\"\n                  }\n                }\n              }]\n            }]\n          }]\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$`Task_1_filterClause`$\",\n      \"fieldType\": \"STRING_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }]\n}"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "1"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Set Filter by Name",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -65,
+      "y": -311
+    }
+  }, {
+    "task": "GenericRestV2Task",
+    "taskId": "5",
+    "parameters": {
+      "throwError": {
+        "key": "throwError",
+        "value": {
+          "booleanValue": true
+        }
+      },
+      "responseBody": {
+        "key": "responseBody",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_5_responseBody`$"]
+          }
+        }
+      },
+      "disableSSLValidation": {
+        "key": "disableSSLValidation",
+        "value": {
+          "booleanValue": false
+        }
+      },
+      "httpParams": {
+        "key": "httpParams"
+      },
+      "authConfigName": {
+        "key": "authConfigName",
+        "value": {
+          "stringValue": ""
+        }
+      },
+      "responseHeader": {
+        "key": "responseHeader",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_5_responseHeader`$"]
+          }
+        }
+      },
+      "userAgent": {
+        "key": "userAgent",
+        "value": {
+          "stringValue": ""
+        }
+      },
+      "httpMethod": {
+        "key": "httpMethod",
+        "value": {
+          "stringValue": "GET"
+        }
+      },
+      "responseStatus": {
+        "key": "responseStatus",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_5_responseStatus`$"]
+          }
+        }
+      },
+      "timeout": {
+        "key": "timeout",
+        "value": {
+          "intValue": "0"
+        }
+      },
+      "url": {
+        "key": "url",
+        "value": {
+          "stringValue": "https://maps.googleapis.com/maps/api/geocode/json"
+        }
+      },
+      "useSSL": {
+        "key": "useSSL",
+        "value": {
+          "booleanValue": false
+        }
+      },
+      "urlFetchingService": {
+        "key": "urlFetchingService",
+        "value": {
+          "stringValue": "HARPOON"
+        }
+      },
+      "urlQueryStrings": {
+        "key": "urlQueryStrings",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.ParameterMap\",\n  \"entries\": [{\n    \"key\": {\n      \"literalValue\": {\n        \"stringValue\": \"latlng\"\n      }\n    },\n    \"value\": {\n      \"referenceKey\": \"$latlng$\"\n    }\n  }, {\n    \"key\": {\n      \"literalValue\": {\n        \"stringValue\": \"key\"\n      }\n    },\n    \"value\": {\n      \"referenceKey\": \"$geocodeApiKey$\"\n    }\n  }]\n}"
+        }
+      },
+      "requestorId": {
+        "key": "requestorId",
+        "value": {
+          "stringValue": ""
+        }
+      },
+      "jsonAdditionalHeaders": {
+        "key": "jsonAdditionalHeaders",
+        "value": {
+          "jsonValue": "null"
+        }
+      },
+      "requestBody": {
+        "key": "requestBody",
+        "value": {
+          "stringValue": ""
+        }
+      },
+      "followRedirects": {
+        "key": "followRedirects",
+        "value": {
+          "booleanValue": true
+        }
+      },
+      "additionalHeaders": {
+        "key": "additionalHeaders"
+      }
+    },
+    "nextTasks": [{
+      "taskId": "6"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Get Address of Base",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -259,
+      "y": 405
+    }
+  }, {
+    "task": "FieldMappingTask",
+    "taskId": "6",
+    "parameters": {
+      "FieldMappingConfigTaskParameterKey": {
+        "key": "FieldMappingConfigTaskParameterKey",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.FieldMappingConfig\",\n  \"mappedFields\": [{\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$`Task_5_responseBody`$\"\n        }\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$geocodeResponse$\",\n      \"fieldType\": \"JSON_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"JSON_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$geocodeResponse.results$\"\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"jsonFunction\": {\n              \"functionName\": \"GET_ELEMENT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"literalValue\": {\n                \"intValue\": \"0\"\n              }\n            }\n          }]\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$geocoded$\",\n      \"fieldType\": \"JSON_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$geocoded.formatted_address$\"\n        }\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$address$\",\n      \"fieldType\": \"STRING_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$geocoded.formatted_address$\"\n        }\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$base.address$\",\n      \"fieldType\": \"STRING_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"JSON_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$alteredBases$\"\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"jsonFunction\": {\n              \"functionName\": \"APPEND_ELEMENT\"\n            }\n          },\n          \"parameters\": [{\n            \"initialValue\": {\n              \"referenceValue\": \"$base$\"\n            }\n          }]\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$bases$\",\n      \"fieldType\": \"JSON_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }]\n}"
+        }
+      }
+    },
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Inject Address",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -258,
+      "y": 525
+    }
+  }, {
+    "task": "Secret Manager - Access",
+    "taskId": "7",
+    "parameters": {
+      "projectsId": {
+        "key": "projectsId",
+        "value": {
+          "stringValue": "$`ProjectId`$"
+        }
+      },
+      "authConfigName": {
+        "key": "authConfigName",
+        "value": {
+          "stringValue": "SecretSA"
+        }
+      },
+      "secretsId": {
+        "key": "secretsId",
+        "value": {
+          "stringValue": "geocode-api-key"
+        }
+      },
+      "authConfig": {
+        "key": "authConfig",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.authconfig.AuthConfigTaskParam\"\n}"
+        }
+      },
+      "response": {
+        "key": "response",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_7_response`$"]
+          }
+        }
+      },
+      "taskTemplateId": {
+        "key": "taskTemplateId",
+        "value": {
+          "stringValue": "4a22d253-e6f9-4b73-80a5-e20a452b2b47"
+        }
+      },
+      "versionsId": {
+        "key": "versionsId",
+        "value": {
+          "stringValue": "$secret-version$"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "8"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Get Geocode API Key",
+    "taskTemplate": "Secret Manager - Access",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -260,
+      "y": 159
+    }
+  }, {
+    "task": "FieldMappingTask",
+    "taskId": "8",
+    "parameters": {
+      "FieldMappingConfigTaskParameterKey": {
+        "key": "FieldMappingConfigTaskParameterKey",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.FieldMappingConfig\",\n  \"mappedFields\": [{\n    \"inputField\": {\n      \"fieldType\": \"JSON_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$`Task_7_response`$\"\n        }\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$secretManagerResponse$\",\n      \"fieldType\": \"JSON_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }, {\n    \"inputField\": {\n      \"fieldType\": \"STRING_VALUE\",\n      \"transformExpression\": {\n        \"initialValue\": {\n          \"referenceValue\": \"$secretManagerResponse.payload.data$\"\n        },\n        \"transformationFunctions\": [{\n          \"functionType\": {\n            \"stringFunction\": {\n              \"functionName\": \"DECODE_BASE64_STRING\"\n            }\n          }\n        }]\n      }\n    },\n    \"outputField\": {\n      \"referenceKey\": \"$geocodeApiKey$\",\n      \"fieldType\": \"STRING_VALUE\",\n      \"cardinality\": \"OPTIONAL\"\n    }\n  }]\n}"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "5"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Prep Geocode Params",
+    "externalTaskType": "NORMAL_TASK",
+    "position": {
+      "x": -260,
+      "y": 281
+    }
+  }],
+  "integrationParameters": [{
+    "key": "`ExecutionMode`",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": ""
+    },
+    "displayName": "`ExecutionMode`",
+    "isTransient": true
+  }, {
+    "key": "`ErrorInfo`",
+    "dataType": "JSON_VALUE",
+    "defaultValue": {
+      "jsonValue": "{\n  \"message\": \"\",\n  \"code\": 0.0\n}"
+    },
+    "displayName": "`ErrorInfo`",
+    "isTransient": true,
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"code\": {\n      \"type\": \"number\"\n    },\n    \"message\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+  }, {
+    "key": "`ExecutionId`",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": ""
+    },
+    "displayName": "`ExecutionId`",
+    "isTransient": true
+  }, {
+    "key": "`IntegrationName`",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": ""
+    },
+    "displayName": "`IntegrationName`",
+    "isTransient": true
+  }, {
+    "key": "`Region`",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": ""
+    },
+    "displayName": "`Region`",
+    "isTransient": true
+  }, {
+    "key": "`ProjectId`",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": ""
+    },
+    "displayName": "`ProjectId`",
+    "isTransient": true
+  }, {
+    "key": "State",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": "Alabama"
+    },
+    "displayName": "State",
+    "inputOutputType": "IN"
+  }, {
+    "key": "Site",
+    "dataType": "STRING_VALUE",
+    "displayName": "Site",
+    "inputOutputType": "IN"
+  }, {
+    "key": "baseCount",
+    "dataType": "INT_VALUE",
+    "displayName": "baseCount"
+  }, {
+    "key": "`Task_5_responseHeader`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_5_responseHeader`",
+    "isTransient": true,
+    "producer": "1_5"
+  }, {
+    "key": "`Task_5_responseBody`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_5_responseBody`",
+    "isTransient": true,
+    "producer": "1_5"
+  }, {
+    "key": "`Task_5_responseStatus`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_5_responseStatus`",
+    "isTransient": true,
+    "producer": "1_5"
+  }, {
+    "key": "latlng",
+    "dataType": "STRING_VALUE",
+    "displayName": "latlng"
+  }, {
+    "key": "geocodeResponse",
+    "dataType": "JSON_VALUE",
+    "displayName": "geocodeResponse",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"results\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"formatted_address\": {\n            \"type\": \"string\"\n          },\n          \"types\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          },\n          \"geometry\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"viewport\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"southwest\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                      \"lng\": {\n                        \"type\": \"number\"\n                      },\n                      \"lat\": {\n                        \"type\": \"number\"\n                      }\n                    }\n                  },\n                  \"northeast\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                      \"lng\": {\n                        \"type\": \"number\"\n                      },\n                      \"lat\": {\n                        \"type\": \"number\"\n                      }\n                    }\n                  }\n                }\n              },\n              \"bounds\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"southwest\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                      \"lng\": {\n                        \"type\": \"number\"\n                      },\n                      \"lat\": {\n                        \"type\": \"number\"\n                      }\n                    }\n                  },\n                  \"northeast\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                      \"lng\": {\n                        \"type\": \"number\"\n                      },\n                      \"lat\": {\n                        \"type\": \"number\"\n                      }\n                    }\n                  }\n                }\n              },\n              \"location\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"lng\": {\n                    \"type\": \"number\"\n                  },\n                  \"lat\": {\n                    \"type\": \"number\"\n                  }\n                }\n              },\n              \"location_type\": {\n                \"type\": \"string\"\n              }\n            }\n          },\n          \"address_components\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"types\": {\n                  \"type\": \"array\",\n                  \"items\": {\n                    \"type\": \"string\"\n                  }\n                },\n                \"short_name\": {\n                  \"type\": \"string\"\n                },\n                \"long_name\": {\n                  \"type\": \"string\"\n                }\n              }\n            }\n          },\n          \"plus_code\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"compound_code\": {\n                \"type\": \"string\"\n              },\n              \"global_code\": {\n                \"type\": \"string\"\n              }\n            }\n          },\n          \"place_id\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    },\n    \"status\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+  }, {
+    "key": "geocoded",
+    "dataType": "JSON_VALUE",
+    "displayName": "geocoded",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"formatted_address\": {\n      \"type\": \"string\"\n    },\n    \"types\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    },\n    \"geometry\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"viewport\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"southwest\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"lng\": {\n                  \"type\": \"number\"\n                },\n                \"lat\": {\n                  \"type\": \"number\"\n                }\n              }\n            },\n            \"northeast\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"lng\": {\n                  \"type\": \"number\"\n                },\n                \"lat\": {\n                  \"type\": \"number\"\n                }\n              }\n            }\n          }\n        },\n        \"location\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"lng\": {\n              \"type\": \"number\"\n            },\n            \"lat\": {\n              \"type\": \"number\"\n            }\n          }\n        },\n        \"location_type\": {\n          \"type\": \"string\"\n        }\n      }\n    },\n    \"address_components\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"types\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n          },\n          \"short_name\": {\n            \"type\": \"string\"\n          },\n          \"long_name\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    },\n    \"plus_code\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"compound_code\": {\n          \"type\": \"string\"\n        },\n        \"global_code\": {\n          \"type\": \"string\"\n        }\n      }\n    },\n    \"place_id\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+  }, {
+    "key": "address",
+    "dataType": "STRING_VALUE",
+    "displayName": "address"
+  }, {
+    "key": "base",
+    "dataType": "JSON_VALUE",
+    "displayName": "base",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"Oper_Stat\": {\n      \"type\": \"string\"\n    },\n    \"OBJECTID_1\": {\n      \"type\": \"number\"\n    },\n    \"State_Terr\": {\n      \"type\": \"string\"\n    },\n    \"OBJECTID\": {\n      \"type\": \"number\"\n    },\n    \"Shape_Leng\": {\n      \"type\": \"number\"\n    },\n    \"AREA\": {\n      \"type\": \"number\"\n    },\n    \"Site_Name\": {\n      \"type\": \"string\"\n    },\n    \"COUNTRY\": {\n      \"type\": \"string\"\n    },\n    \"Shape_Area\": {\n      \"type\": \"number\"\n    },\n    \"Long\": {\n      \"type\": \"number\"\n    },\n    \"COMPONENT\": {\n      \"type\": \"string\"\n    },\n    \"Joint_Base\": {\n      \"type\": \"string\"\n    },\n    \"Lat\": {\n      \"type\": \"number\"\n    },\n    \"PERIMETER\": {\n      \"type\": \"number\"\n    },\n    \"address\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+  }, {
+    "key": "alteredBases",
+    "dataType": "JSON_VALUE",
+    "defaultValue": {
+      "jsonValue": "[]"
+    },
+    "displayName": "alteredBases",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"Oper_Stat\": {\n        \"type\": \"string\"\n      },\n      \"OBJECTID_1\": {\n        \"type\": \"number\"\n      },\n      \"State_Terr\": {\n        \"type\": \"string\"\n      },\n      \"OBJECTID\": {\n        \"type\": \"number\"\n      },\n      \"Shape_Leng\": {\n        \"type\": \"number\"\n      },\n      \"AREA\": {\n        \"type\": \"number\"\n      },\n      \"Site_Name\": {\n        \"type\": \"string\"\n      },\n      \"COUNTRY\": {\n        \"type\": \"string\"\n      },\n      \"Shape_Area\": {\n        \"type\": \"number\"\n      },\n      \"Long\": {\n        \"type\": \"number\"\n      },\n      \"COMPONENT\": {\n        \"type\": \"string\"\n      },\n      \"Joint_Base\": {\n        \"type\": \"string\"\n      },\n      \"Lat\": {\n        \"type\": \"number\"\n      },\n      \"PERIMETER\": {\n        \"type\": \"number\"\n      },\n      \"address\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}"
+  }, {
+    "key": "bases",
+    "dataType": "JSON_VALUE",
+    "displayName": "bases",
+    "inputOutputType": "OUT",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"array\",\n  \"items\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"Oper_Stat\": {\n        \"type\": \"string\"\n      },\n      \"OBJECTID_1\": {\n        \"type\": \"number\"\n      },\n      \"State_Terr\": {\n        \"type\": \"string\"\n      },\n      \"OBJECTID\": {\n        \"type\": \"number\"\n      },\n      \"Shape_Leng\": {\n        \"type\": \"number\"\n      },\n      \"AREA\": {\n        \"type\": \"number\"\n      },\n      \"Site_Name\": {\n        \"type\": \"string\"\n      },\n      \"COUNTRY\": {\n        \"type\": \"string\"\n      },\n      \"Shape_Area\": {\n        \"type\": \"number\"\n      },\n      \"Long\": {\n        \"type\": \"number\"\n      },\n      \"COMPONENT\": {\n        \"type\": \"string\"\n      },\n      \"Joint_Base\": {\n        \"type\": \"string\"\n      },\n      \"Lat\": {\n        \"type\": \"number\"\n      },\n      \"PERIMETER\": {\n        \"type\": \"number\"\n      },\n      \"address\": {\n        \"type\": \"string\"\n      }\n    }\n  }\n}"
+  }, {
+    "key": "`Task_7_response`",
+    "dataType": "JSON_VALUE",
+    "displayName": "`Task_7_response`",
+    "isTransient": true,
+    "producer": "1_7",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"payload\": {\n      \"properties\": {\n        \"dataCrc32c\": {\n          \"description\": \"Optional. If specified, SecretManagerService will verify the integrity of the received data on SecretManagerService.AddSecretVersion calls using the crc32c checksum and store it to include in future SecretManagerService.AccessSecretVersion responses. If a checksum is not provided in the SecretManagerService.AddSecretVersion request, the SecretManagerService will generate and store one for you. The CRC32C value is encoded as a Int64 for compatibility, and can be safely downconverted to uint32 in languages that support this type. https://cloud.google.com/apis/design/design_patterns#integer_types\",\n          \"format\": \"int64\",\n          \"type\": \"string\"\n        },\n        \"data\": {\n          \"type\": \"string\",\n          \"format\": \"byte\",\n          \"description\": \"The secret data. Must be no larger than 64KiB.\"\n        }\n      },\n      \"type\": \"object\",\n      \"description\": \"A secret payload resource in the Secret Manager API. This contains the sensitive secret payload that is associated with a SecretVersion.\"\n    },\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The resource name of the SecretVersion in the format `projects/*/secrets/*/versions/*`.\"\n    }\n  }\n}"
+  }, {
+    "key": "secret-version",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": "latest"
+    },
+    "displayName": "secret-version"
+  }, {
+    "key": "geocodeApiKey",
+    "dataType": "STRING_VALUE",
+    "displayName": "geocodeApiKey"
+  }, {
+    "key": "`Task_1_listEntitiesPageSize`",
+    "dataType": "INT_VALUE",
+    "displayName": "`Task_1_listEntitiesPageSize`",
+    "producer": "1_1"
+  }, {
+    "key": "`Task_1_listEntitiesPageToken`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_1_listEntitiesPageToken`",
+    "producer": "1_1"
+  }, {
+    "key": "`Task_1_listEntitiesSortByColumns`",
+    "dataType": "STRING_ARRAY",
+    "displayName": "`Task_1_listEntitiesSortByColumns`",
+    "producer": "1_1"
+  }, {
+    "key": "`Task_1_filterClause`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_1_filterClause`",
+    "producer": "1_1"
+  }, {
+    "key": "`Task_1_connectorOutputPayload`",
+    "dataType": "JSON_VALUE",
+    "displayName": "`Task_1_connectorOutputPayload`",
+    "isTransient": true,
+    "producer": "1_1",
+    "jsonSchema": "{\n  \"type\": [\"array\"],\n  \"items\": {\n    \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n    \"type\": \"object\",\n    \"properties\": {\n      \"COUNTRY\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Country\"\n      },\n      \"OBJECTID_1\": {\n        \"type\": [\"integer\", \"null\"],\n        \"description\": \"Object ID 1\"\n      },\n      \"Site_Name\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Site Name\"\n      },\n      \"Oper_Stat\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Operational Status\"\n      },\n      \"State_Terr\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"State or Territory\"\n      },\n      \"OBJECTID\": {\n        \"type\": [\"integer\", \"null\"],\n        \"description\": \"Object ID\"\n      },\n      \"Shape_Leng\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Shape Length\"\n      },\n      \"AREA\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Area\"\n      },\n      \"Shape_Area\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Shape Area\"\n      },\n      \"Joint_Base\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Joint Base\"\n      },\n      \"Long\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Longitude\"\n      },\n      \"COMPONENT\": {\n        \"type\": [\"string\", \"null\"],\n        \"description\": \"Component\"\n      },\n      \"PERIMETER\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Perimeter\"\n      },\n      \"Lat\": {\n        \"type\": [\"number\", \"null\"],\n        \"description\": \"Latitude\"\n      }\n    }\n  },\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\"\n}"
+  }, {
+    "key": "`Task_1_listEntitiesNextPageToken`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_1_listEntitiesNextPageToken`",
+    "isTransient": true,
+    "producer": "1_1"
+  }, {
+    "key": "secretManagerResponse",
+    "dataType": "JSON_VALUE",
+    "displayName": "secretManagerResponse",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-07/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"payload\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"dataCrc32c\": {\n          \"type\": \"string\"\n        },\n        \"data\": {\n          \"type\": \"string\"\n        }\n      }\n    },\n    \"name\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+  }],
+  "databasePersistencePolicy": "DATABASE_PERSISTENCE_ASYNC",
+  "cloudLoggingDetails": {
+    "cloudLoggingSeverity": "CLOUD_LOGGING_SEVERITY_UNSPECIFIED",
+    "enableCloudLogging": false
+  },
+  "userLabel": "Lookup Base"
+}

@@ -1,0 +1,86 @@
+[
+    {
+      "name": "Lat",
+      "type": "FLOAT",
+      "mode": "NULLABLE",
+      "description": "Latitude"
+    },
+    {
+      "name": "Long",
+      "type": "FLOAT",
+      "mode": "NULLABLE",
+      "description": "Longitude"
+    },
+    {
+      "name": "OBJECTID_1",
+      "type": "INTEGER",
+      "mode": "NULLABLE",
+      "description": "Object ID 1"
+    },
+    {
+      "name": "OBJECTID",
+      "type": "INTEGER",
+      "mode": "NULLABLE",
+      "description": "Object ID"
+    },
+    {
+      "name": "COMPONENT",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Component"
+    },
+    {
+      "name": "Site_Name",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Site Name"
+    },
+    {
+      "name": "Joint_Base",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Joint Base"
+    },
+    {
+      "name": "State_Terr",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "State or Territory"
+    },
+    {
+      "name": "COUNTRY",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Country"
+    },
+    {
+      "name": "Oper_Stat",
+      "type": "STRING",
+      "mode": "NULLABLE",
+      "description": "Operational Status"
+    },
+    {
+      "name": "PERIMETER",
+      "type": "FLOAT",
+      "mode": "NULLABLE",
+      "description": "Perimeter"
+    },
+    {
+      "name": "AREA",
+      "type": "FLOAT",
+      "mode": "NULLABLE",
+      "description": "Area"
+    },
+    {
+      "name": "Shape_Leng",
+      "type": "FLOAT",
+      "mode": "NULLABLE",
+      "description": "Shape Length"
+    },
+    {
+      "name": "Shape_Area",
+      "type": "FLOAT",
+      "mode": "NULLABLE",
+      "description": "Shape Area"
+    }
+  ]

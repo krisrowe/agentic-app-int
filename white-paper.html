@@ -65,9 +65,9 @@
             <section id="executive-summary">
                 <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">1.0 Executive Summary: The Agentic Shift</h2>
                 <div class="space-y-4 text-lg text-gray-600 leading-relaxed">
-                    <p><strong class="font-semibold text-gray-700">The Coming Wave:</strong> The digital landscape is shifting from human-driven applications to autonomous AI agents that communicate and execute complex tasks on our behalf. This agentic architecture, powered by LLMs and Machine-to-Machine Communication Protocols (MCP), promises unprecedented efficiency and automation.</p>
+                    <p><strong class="font-semibold text-gray-700">The Coming Wave:</strong> The digital landscape is shifting from human-driven applications to autonomous AI agents that communicate and execute complex tasks on our behalf. This agentic architecture, powered by LLMs and new Machine-to-Machine Communication Protocols (MCP), promises unprecedented efficiency and automation.</p>
                     <p><strong class="font-semibold text-gray-700">A New API Consumer:</strong> This wave introduces a new, dominant consumer of APIs: the AI agent. These agents are fast, scalable, and operate 24/7, fundamentally changing traffic patterns, security requirements, and the very definition of an "API product."</p>
-                    <p class="p-4 bg-google-blue-50 border-l-4 border-google-blue-400 rounded-r-lg"><strong class="font-semibold text-gray-800">The Thesis:</strong> This paper argues that while agentic platforms provide the "brain" for this new paradigm, they do not replace the need for a robust API Management (APIM) platform. Instead, APIM platforms like Apigee, in concert with a powerful, natively integrated backend like <strong class="text-google-blue-600">GCP's Application Integration</strong>, become more critical than ever. They evolve from a simple gateway into an essential <strong class="text-google-blue-600">governance and control plane</strong> for managing a complex ecosystem of autonomous AI agents, providing the trust, reliability, and security necessary to unleash the power of agentic architecture safely and at scale.</p>
+                    <p class="p-4 bg-google-blue-50 border-l-4 border-google-blue-400 rounded-r-lg"><strong class="font-semibold text-gray-800">The Thesis:</strong> This paper argues that while agentic frameworks provide the "brain" for this new paradigm, they do not replace the need for a robust API Management (APIM) platform. Instead, APIM platforms like Apigee, in concert with a powerful, natively integrated backend like <strong class="text-google-blue-600">GCP's Application Integration</strong>, become more critical than ever. They evolve from a simple gateway into an essential <strong class="text-google-blue-600">governance and control plane</strong> for managing a complex ecosystem of autonomous AI agents, providing the trust, reliability, and security necessary to unleash the power of agentic architecture safely and at scale.</p>
                 </div>
             </section>
 
@@ -171,7 +171,7 @@
                             <div class="flex-shrink-0 h-8 w-8 rounded-full bg-google-blue-600 text-white flex items-center justify-center font-bold text-lg mr-4">1</div>
                             <div>
                                 <h4 class="text-xl font-semibold text-gray-800">Application Logic (The "What")</h4>
-                                <p class="text-gray-600">Managed by the agentic platform, this layer excels at understanding user intent, managing conversation, and deciding *what* business capability to trigger.</p>
+                                <p class="text-gray-600">Managed by the agentic platform, this layer excels at understanding user intent, managing conversation, and defining the <strong class="font-medium">Machine-to-Machine Communication Protocol (MCP)</strong> to decide *what* business capability to trigger.</p>
                             </div>
                         </li>
                         <li class="flex items-start">
@@ -194,10 +194,24 @@
                 </div>
             </section>
             
-            <!-- 5.0 The Control Plane Imperative -->
+            <!-- 5.0 MCP over HTTP -->
+            <section id="mcp-http">
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">5.0 MCP over HTTP: Same Foundation, Amplified Risk</h2>
+                <div class="bg-white p-8 rounded-lg shadow-md space-y-4">
+                    <p class="text-lg text-gray-600 leading-relaxed">To accurately position API Management in the agentic era, it's crucial to understand the relationship between MCP and the underlying protocols that power the web. For nearly all practical implementations, **Machine-to-Machine Communication Protocols (MCP) are an application-layer concept running on top of HTTP/S.** The "protocol" aspect of MCP is about the *semantics* of the agent's conversation, not reinventing the transport layer that leading platforms like Apigee have spent over a decade perfecting.</p>
+                    <p class="text-lg text-gray-600 leading-relaxed">Because this foundation remains the same, the entire threat model and the need for security and management tooling are unchanged. However, agents act as a massive <strong class="font-semibold text-gray-800">force multiplier</strong> on this foundation, dramatically amplifying risk and turning minor issues into major incidents.</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                        <div class="p-4 bg-gray-50 rounded-lg"><h4 class="font-bold text-google-red-700 text-lg">Amplification of Scale</h4><p class="text-sm">Agents can generate thousands of calls per second, overwhelming unprotected backends.</p></div>
+                        <div class="p-4 bg-gray-50 rounded-lg"><h4 class="font-bold text-google-red-700 text-lg">Amplification of Sophistication</h4><p class="text-sm">Attacks become surgical, mimicking legitimate but unusual behavior to probe for weaknesses or distill model intelligence.</p></div>
+                        <div class="p-4 bg-gray-50 rounded-lg"><h4 class="font-bold text-google-red-700 text-lg">Amplification of Complexity</h4><p class="text-sm">Emergent reasoning chains make debugging failures exponentially harder without an end-to-end trace.</p></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 6.0 The Control Plane Imperative -->
             <section id="control-plane-imperative">
-                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">5.0 The Control Plane Imperative: Mitigating Agent-Only Risks</h2>
-                 <p class="mb-8 text-lg text-gray-600 leading-relaxed">Agentic frameworks are brilliant application development paradigms, but they are not enterprise integration or governance platforms. Arguing that an agent can "just use a toolbelt" of granular APIs ignores the significant operational, financial, and security risks of this approach. An API management control plane is essential to mitigate these risks.</p>
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">6.0 The Control Plane Imperative: Mitigating Agent-Only Risks</h2>
+                 <p class="mb-8 text-lg text-gray-600 leading-relaxed">While emergent MCPs define *how* agents interact, they don't inherently provide the enterprise-grade governance needed to manage *what* they are allowed to do. Arguing that an agent can simply use its native MCP and a "toolbelt" of granular APIs ignores the significant operational, financial, and security risks of this approach. An API management control plane is essential to mitigate these risks.</p>
                  <div class="space-y-6">
                     <div class="p-6 bg-white rounded-lg border-l-4 border-red-500 shadow-sm">
                         <h4 class="text-xl font-semibold text-google-red-700 mb-2">The "Total Cost of Ownership" of a Goal</h4>
@@ -214,9 +228,9 @@
                  </div>
             </section>
 
-            <!-- 6.0 Public Sector Use Case -->
+            <!-- 7.0 Public Sector Use Case -->
             <section id="use-case">
-                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">6.0 A Public Sector Use Case</h2>
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">7.0 A Public Sector Use Case</h2>
                 <div class="bg-white p-8 rounded-lg shadow-md space-y-8">
                     <div class="p-4 border border-gray-200 rounded-lg bg-google-blue-50">
                         <p class="text-lg"><strong class="font-semibold text-gray-800">The Scenario:</strong> A state agency wants to deploy an AI digital assistant to help citizens apply for social benefits (unemployment, housing, food aid). A citizen says, "I lost my job and my apartment. I need help." This single request requires secure, audited access to multiple departmental systems.</p>
@@ -265,9 +279,9 @@
                 </div>
             </section>
 
-            <!-- 7.0 Conclusion -->
+            <!-- 8.0 Conclusion -->
              <section id="conclusion">
-                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">7.0 Conclusion: Apigee as the Indispensable Control Plane</h2>
+                <h2 class="text-3xl font-bold text-gray-800 border-l-4 border-google-blue-400 pl-4 mb-6">8.0 Conclusion: Apigee as the Indispensable Control Plane</h2>
                 <div class="text-lg text-gray-600 leading-relaxed space-y-4">
                      <p>The agentic future doesn't diminish the need for API Management; it elevates it. As businesses and governments delegate more autonomy to AI agents, the need for a trusted, observable, and secure control plane becomes an absolute necessity.</p>
                      <p class="font-semibold text-gray-800 bg-gray-100 p-4 rounded-lg border border-gray-200">Relying on agents to self-govern access to critical systems is not a scalable or secure strategy. Full-lifecycle API Management with Apigee, powered by a robust and natively integrated orchestration engine like Application Integration, provides the essential framework to manage this new reality, ensuring the power of AI is harnessed in a way that is reliable, governed, and aligned with business and regulatory objectives.</p>
